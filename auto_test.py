@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 global dirs, nodes, ranks_per_node
 dirs = ["in_container/", "out_container/", "same_nodes/", "different_nodes/"]
 nodes = ["1", "2", "4", "8"]
-ranks_per_node = ["8", "16", "32", "64", "128"]
+ranks_per_node = ["1", "2", "4", "8", "16", "32", "64"]
 
 
 def main():
@@ -95,7 +95,7 @@ def copy_base_dir(job_dir,base_dir='basejob'):
 
 
 submit_template = '''#!/bin/bash
-#COBALT -n 256
+#COBALT -n 128
 #COBALT -t 180
 #COBALT -q {queue}
 #COBALT -A datascience
@@ -114,80 +114,16 @@ if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_C
    #run benchmark without singularity
    echo RUNNING OUTSIDE OF CONTAINER
    echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   sleep 3
    echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   sleep 3
    echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
-   echo EIGHT NODES 
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
-   wait
-fi
-
-# Use Cray's Application Binary Independent MPI build
-module swap cray-mpich cray-mpich-abi
-
-
-# include CRAY_LD_LIBRARY_PATH in to the system library path
-export LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
-# also need this additional library
-export LD_LIBRARY_PATH=/opt/cray/wlm_detect/1.3.2-6.0.6.0_3.8__g388ccd5.ari/lib64/:$LD_LIBRARY_PATH
-# in order to pass environment variables to a Singularity container create the variable
-# with the SINGULARITYENV_ prefix
-export SINGULARITYENV_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-# print to log file for debug
-echo $SINGULARITYENV_LD_LIBRARY_PATH
-
-
-# -n <total MPI ranks>
-# -N <MPI ranks per node>
-#export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$SINGULARITYENV_LD_LIBRARY_PATH
-# aprun -n 1 -N 1 singularity exec testbuild2.simg /bin/bash -c "echo \$LD_LIBRARY_PATH"
-
-if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
-   echo RUNNING INSIDE CONTAINER
-   echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
-   echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
-   echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   sleep 3
    echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
-   wait
-fi
-'''
-
-submit_template2 = '''#!/bin/bash
-#COBALT -n 256
-#COBALT -t 180
-#COBALT -q {queue}
-#COBALT -A datascience
-#COBALT --jobname {job_num}
-#COBALT --cwd {job_dir}
-#COBALT --attrs location=4000-4127
-
-echo SAME NODES TRUE
-
-RANKS_PER_NODE={num_ranks}
-NUM_NODES=$COBALT_JOBSIZE
-TOTAL_RANKS=$(( $COBALT_JOBSIZE * $RANKS_PER_NODE ))
-
-
-# app build with GNU not Intel
-module swap PrgEnv-intel PrgEnv-gnu
-USE_CONTAINER={use_container}
-if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_CONTAINER" = "False" ]; then
-   #run benchmark without singularity
-   echo RUNNING OUTSIDE OF CONTAINER
-   echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
-   echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
-   echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
-   echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
    wait
 fi
 
@@ -215,13 +151,90 @@ if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CON
    export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:/mpich/install/lib
    echo RUNNING INSIDE CONTAINER
    echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 1_node.txt 2>&1 &
+   sleep 3
    echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 2_node.txt 2>&1 &
+   sleep 3
    echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 4_node.txt 2>&1 &
+   sleep 3
    echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 8_node.txt 2>&1 &
+   wait
+fi
+'''
+
+submit_template2 = '''#!/bin/bash
+#COBALT -n 128
+#COBALT -t 180
+#COBALT -q {queue}
+#COBALT -A datascience
+#COBALT --jobname {job_num}
+#COBALT --cwd {job_dir}
+#COBALT --attrs location=4000-4127
+
+echo SAME NODES TRUE
+
+RANKS_PER_NODE={num_ranks}
+NUM_NODES=$COBALT_JOBSIZE
+TOTAL_RANKS=$(( $COBALT_JOBSIZE * $RANKS_PER_NODE ))
+
+
+# app build with GNU not Intel
+module swap PrgEnv-intel PrgEnv-gnu
+USE_CONTAINER={use_container}
+if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_CONTAINER" = "False" ]; then
+   #run benchmark without singularity
+   echo RUNNING OUTSIDE OF CONTAINER
+   echo ONE NODE
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   sleep 3
+   echo TWO NODES
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   sleep 3
+   echo FOUR NODES
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   sleep 3
+   echo EIGHT NODES
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   wait
+fi
+
+# Use Cray's Application Binary Independent MPI build
+module swap cray-mpich cray-mpich-abi
+
+
+# include CRAY_LD_LIBRARY_PATH in to the system library path
+export LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
+# also need this additional library
+export LD_LIBRARY_PATH=/opt/cray/wlm_detect/1.3.2-6.0.6.0_3.8__g388ccd5.ari/lib64/:$LD_LIBRARY_PATH
+# in order to pass environment variables to a Singularity container create the variable
+# with the SINGULARITYENV_ prefix
+export SINGULARITYENV_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+# print to log file for debug
+echo $SINGULARITYENV_LD_LIBRARY_PATH
+
+
+# -n <total MPI ranks>
+# -N <MPI ranks per node>
+#export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$SINGULARITYENV_LD_LIBRARY_PATH
+# aprun -n 1 -N 1 singularity exec testbuild2.simg /bin/bash -c "echo \$LD_LIBRARY_PATH"
+
+if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
+   export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:/mpich/install/lib
+   echo RUNNING INSIDE CONTAINER
+   echo ONE NODE
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 1_node.txt 2>&1 &
+   sleep 3
+   echo TWO NODES
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 2_node.txt 2>&1 &
+   sleep 3
+   echo FOUR NODES
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 4_node.txt 2>&1 &
+   sleep 3
+   echo EIGHT NODES
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 8_node.txt 2>&1 &
    wait
 fi
 '''
