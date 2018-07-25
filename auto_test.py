@@ -114,16 +114,13 @@ if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_C
    #run benchmark without singularity
    echo RUNNING OUTSIDE OF CONTAINER
    echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
-   sleep 3
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
    echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
-   sleep 3
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
    echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
-   sleep 3
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
    echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
    wait
 fi
 
@@ -151,16 +148,13 @@ if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CON
    export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:/mpich/install/lib
    echo RUNNING INSIDE CONTAINER
    echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 1_node.txt 2>&1 &
-   sleep 3
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
    echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 2_node.txt 2>&1 &
-   sleep 3
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
    echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 4_node.txt 2>&1 &
-   sleep 3
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
    echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 8_node.txt 2>&1 &
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
    wait
 fi
 '''
@@ -188,16 +182,13 @@ if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_C
    #run benchmark without singularity
    echo RUNNING OUTSIDE OF CONTAINER
    echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
-   sleep 3
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
    echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
-   sleep 3
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
    echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
-   sleep 3
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
    echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast > 1_node.txt 2>&1 &
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/collective/osu_bcast
    wait
 fi
 
@@ -225,16 +216,13 @@ if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CON
    export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:/mpich/install/lib
    echo RUNNING INSIDE CONTAINER
    echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 1_node.txt 2>&1 &
-   sleep 3
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
    echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 2_node.txt 2>&1 &
-   sleep 3
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
    echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 4_node.txt 2>&1 &
-   sleep 3
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
    echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 8_node.txt 2>&1 &
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container
    wait
 fi
 '''
