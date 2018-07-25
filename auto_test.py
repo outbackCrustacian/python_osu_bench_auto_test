@@ -97,7 +97,7 @@ def copy_base_dir(job_dir,base_dir='basejob'):
 
 
 submit_template = '''#!/bin/bash
-#COBALT -n 128
+#COBALT -n 256
 #COBALT -t 180
 #COBALT -q {queue}
 #COBALT -A datascience
@@ -152,22 +152,22 @@ echo $SINGULARITYENV_LD_LIBRARY_PATH
 if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
    echo RUNNING INSIDE CONTAINER
    echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/updatedbenchcontainer &
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container &
    sleep 3
    echo TWO NODES &
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/updatedbenchcontainer &
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container &
    sleep 3
    echo FOUR NODES &
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/updatedbenchcontainer &
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container &
    sleep 3
    echo EIGHT NODES &
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/updatedbenchcontainer &
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container &
    wait
 fi
 '''
 
 submit_template2 = '''#!/bin/bash
-#COBALT -n 128
+#COBALT -n 256
 #COBALT -t 180
 #COBALT -q {queue}
 #COBALT -A datascience
@@ -225,16 +225,16 @@ echo $SINGULARITYENV_LD_LIBRARY_PATH
 if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
    echo RUNNING INSIDE CONTAINER
    echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/updatedbenchcontainer &
+   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container &
    sleep 3
    echo TWO NODES &
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/updatedbenchcontainer &
+   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container &
    sleep 3
    echo FOUR NODES &
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/updatedbenchcontainer &
+   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container &
    sleep 3
    echo EIGHT NODES &
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/updatedbenchcontainer &
+   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container &
    wait
 fi
 '''
