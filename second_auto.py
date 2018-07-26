@@ -148,7 +148,7 @@ submit_template2 = '''#!/bin/bash
 #COBALT -A datascience
 #COBALT --jobname {job_num}
 #COBALT --cwd {job_dir}
-#COBALT --attrs location=4000-4127
+#COBALT --attrs location=1000-1511
 
 echo SAME NODES TRUE
 
