@@ -3,11 +3,8 @@ import os, sys, optparse, logging, glob, stat, json
 logger = logging.getLogger(__name__)
 
 #set up lists to be looped through later
-global dirs, nodes, ranks_per_node
+global dirs
 dirs = ["in_container/", "out_container/", "same_nodes/", "different_nodes/"]
-nodes = ["1", "2", "4", "8"]
-ranks_per_node = ["1", "2", "4", "8", "16", "32", "64"]
-
 
 def main():
     #create a base directory
@@ -24,40 +21,34 @@ def main():
         os.mkdir(dirs[2])
         os.chdir(dirs[2])
         if(dirs[i] == dirs[1]):
-            for d in range(len(ranks_per_node)):
-                #creating files and directories for each different mpi rank per node to be tested
-                create_submit(False, True, ranks_per_node[d])
+            create_submit(False, True)
         else:
-            for d in range(len(ranks_per_node)):
-                create_submit(True, True, ranks_per_node[d])
+            create_submit(True, True)
         os.chdir("..")
         os.mkdir(dirs[3])
         os.chdir(dirs[3])
         if (dirs[i] == dirs[1]):
-            for d in range(len(ranks_per_node)):
-                create_submit(False, False, ranks_per_node[d])
+            create_submit(False, False)
         else:
-            for d in range(len(ranks_per_node)):
-                create_submit(True, False, ranks_per_node[d])
+            create_submit(True, False)
         os.chdir("..")
         os.chdir("..")
         i += 1
 
-def create_submit(use_container, same_nodes, num_ranks):
-    job_num = 'numranks' + str(num_ranks)
+def create_submit(use_container, same_nodes):
+    job_num = 'SameNodes' + str(same_nodes)
 
     job_dir = os.getcwd() + '/' + job_num
 
     logger.info('building job directory: %s', job_dir)
-    logger.info('    num_ranks: %5d   use_container: %6s  same_nodes: %6s', int(num_ranks), use_container, same_nodes)
+    logger.info('    use_container: %6s  same_nodes: %6s', use_container, same_nodes)
 
     if os.path.exists(job_dir):
         raise Exception('job directory already exists: %s' % job_dir)
     os.mkdir(job_dir)
 
     # dump settings to text file for record keeping
-    settings = {'num_ranks': int(num_ranks),
-                'use_container': use_container,
+    settings = {'use_container': use_container,
                 'same_nodes' : same_nodes
                 }
     json.dump(settings, open(job_dir + '/settings.txt', 'w'))
@@ -68,14 +59,12 @@ def create_submit(use_container, same_nodes, num_ranks):
     # create submit file
     queue = 'default'
     if same_nodes == True:
-        submit = submit_template2.format(num_ranks=num_ranks,
-                                        queue=queue,
+        submit = submit_template2.format(queue=queue,
                                         job_dir=job_dir,
                                         job_num=job_num,
                                         use_container=use_container)
     else:
-        submit = submit_template.format(num_ranks=num_ranks,
-                                        queue=queue,
+        submit = submit_template.format(queue=queue,
                                         job_dir=job_dir,
                                         job_num=job_num,
                                         use_container=use_container)
@@ -85,24 +74,23 @@ def create_submit(use_container, same_nodes, num_ranks):
     os.system('qsub submit.sh')
     os.chdir("..")
 
-def copy_base_dir(job_dir,base_dir='basejob'):
+def copy_base_dir(job_dir, base_dir='basejob'):
 
-   # copy EVNT files
-   os.system('cp -d ' + base_dir + '/EVNT* ' + job_dir)
+    # copy EVNT files
+    os.system('cp -d ' + base_dir + '/EVNT* ' + job_dir)
 
-   # copy json files
-   os.system('cp ' + base_dir + '/*json* ' + job_dir)
-
+    # copy json files
+    os.system('cp ' + base_dir + '/*json* ' + job_dir)
 
 submit_template = '''#!/bin/bash
-#COBALT -n 128
-#COBALT -t 180
+#COBALT -n 512
+#COBALT -t 540
 #COBALT -q {queue}
 #COBALT -A datascience
 #COBALT --jobname {job_num}
 #COBALT --cwd {job_dir}
 
-RANKS_PER_NODE={num_ranks}
+RANKS_PER_NODE=1
 NUM_NODES=$COBALT_JOBSIZE
 TOTAL_RANKS=$(( $COBALT_JOBSIZE * $RANKS_PER_NODE ))
 
@@ -111,16 +99,13 @@ TOTAL_RANKS=$(( $COBALT_JOBSIZE * $RANKS_PER_NODE ))
 module swap PrgEnv-intel PrgEnv-gnu
 USE_CONTAINER={use_container}
 if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_CONTAINER" = "False" ]; then
-   #run benchmark without singularity
    echo RUNNING OUTSIDE OF CONTAINER
-   echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 1_node.txt 2>$1 &
-   echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 2_node.txt 2>&1 &
-   echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 4_node.txt 2>&1 &
-   echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 8_node.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_one.txt 2>$1 &
+   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_two.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_three.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_four.txt 2>&1 &
+   aprun -n 256 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 256_one.txt 2>&1 &
+   aprun -n 256 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 256_one.txt 2>&1 &
    wait
 fi
 
@@ -146,21 +131,19 @@ export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$SINGULARI
 
 if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
    echo RUNNING INSIDE CONTAINER
-   echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 1_node.txt 2>&1 &
-   echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 2_node.txt 2>&1 &
-   echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 4_node.txt 2>&1 &
-   echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 8_node.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_one.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_two.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_three.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_four.txt 2>&1 &
+   aprun -n 256 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 256_one.txt 2>&1 &
+   aprun -n 256 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 256_two.txt 2>&1 &
    wait
 fi
 '''
 
 submit_template2 = '''#!/bin/bash
-#COBALT -n 128
-#COBALT -t 180
+#COBALT -n 512
+#COBALT -t 540
 #COBALT -q {queue}
 #COBALT -A datascience
 #COBALT --jobname {job_num}
@@ -169,7 +152,7 @@ submit_template2 = '''#!/bin/bash
 
 echo SAME NODES TRUE
 
-RANKS_PER_NODE={num_ranks}
+RANKS_PER_NODE=1
 NUM_NODES=$COBALT_JOBSIZE
 TOTAL_RANKS=$(( $COBALT_JOBSIZE * $RANKS_PER_NODE ))
 
@@ -178,16 +161,13 @@ TOTAL_RANKS=$(( $COBALT_JOBSIZE * $RANKS_PER_NODE ))
 module swap PrgEnv-intel PrgEnv-gnu
 USE_CONTAINER={use_container}
 if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_CONTAINER" = "False" ]; then
-   #run benchmark without singularity
    echo RUNNING OUTSIDE OF CONTAINER
-   echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 1_node.txt 2>$1 &
-   echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 2_node.txt 2>&1 &
-   echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 4_node.txt 2>&1 &
-   echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 8_node.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_one.txt 2>$1 &
+   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_two.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_three.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_four.txt 2>&1 &
+   aprun -n 256 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 256_one.txt 2>&1 &
+   aprun -n 256 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 256_one.txt 2>&1 &
    wait
 fi
 
@@ -212,16 +192,13 @@ export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$SINGULARI
 # aprun -n 1 -N 1 singularity exec testbuild2.simg /bin/bash -c "echo \$LD_LIBRARY_PATH"
 
 if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
-
    echo RUNNING INSIDE CONTAINER
-   echo ONE NODE
-   aprun -n $RANKS_PER_NODE -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 1_node.txt 2>&1 &
-   echo TWO NODES
-   aprun -n $(($RANKS_PER_NODE*2)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 2_node.txt 2>&1 &
-   echo FOUR NODES
-   aprun -n $(($RANKS_PER_NODE*4)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 4_node.txt 2>&1 &
-   echo EIGHT NODES
-   aprun -n $(($RANKS_PER_NODE*8)) -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 8_node.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_one.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_two.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_three.txt 2>&1 &
+   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_four.txt 2>&1 &
+   aprun -n 256 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 256_one.txt 2>&1 &
+   aprun -n 256 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 256_two.txt 2>&1 &
    wait
 fi
 '''
