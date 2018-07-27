@@ -100,12 +100,9 @@ module swap PrgEnv-intel PrgEnv-gnu
 USE_CONTAINER={use_container}
 if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_CONTAINER" = "False" ]; then
    echo RUNNING OUTSIDE OF CONTAINER
-   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_one.txt 2>$1 &
-   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_two.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_three.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_four.txt 2>&1 &
-   aprun -n 256 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 256_one.txt 2>&1 &
-   aprun -n 256 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 256_one.txt 2>&1 &
+   /home/sgww/crazy_auto_test/firstestout.sh > 128_one.txt 2>$1 &
+   /home/sgww/crazy_auto_test/firstestout.sh > 128_two.txt 2>$1 &
+   /home/sgww/crazy_auto_test/secondtestout.sh > 256_one.txt 2>&1 &
    wait
 fi
 
@@ -131,12 +128,9 @@ export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$SINGULARI
 
 if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
    echo RUNNING INSIDE CONTAINER
-   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_one.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_two.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_three.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_four.txt 2>&1 &
-   aprun -n 256 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 256_one.txt 2>&1 &
-   aprun -n 256 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 256_two.txt 2>&1 &
+   /home/sgww/crazy_auto_test/firstestin.sh > 128_one.txt 2>$1 &
+   /home/sgww/crazy_auto_test/firstestin.sh > 128_two.txt 2>$1 &
+   /home/sgww/crazy_auto_test/secondtestin.sh > 256_one.txt 2>&1 &
    wait
 fi
 '''
@@ -162,12 +156,9 @@ module swap PrgEnv-intel PrgEnv-gnu
 USE_CONTAINER={use_container}
 if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_CONTAINER" = "False" ]; then
    echo RUNNING OUTSIDE OF CONTAINER
-   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_one.txt 2>$1 &
-   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_two.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_three.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 128_four.txt 2>&1 &
-   aprun -n 256 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 256_one.txt 2>&1 &
-   aprun -n 256 -N $RANKS_PER_NODE /home/sgww/osu_bench/mpi/pt2pt/osu_mbw_mr > 256_one.txt 2>&1 &
+   /home/sgww/crazy_auto_test/firstestout.sh > 128_one.txt 2>$1 &
+   /home/sgww/crazy_auto_test/firstestout.sh > 128_two.txt 2>$1 &
+   /home/sgww/crazy_auto_test/secondtestout.sh > 256_one.txt 2>&1 &
    wait
 fi
 
@@ -193,12 +184,9 @@ export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$SINGULARI
 
 if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
    echo RUNNING INSIDE CONTAINER
-   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_one.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_two.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_three.txt 2>&1 &
-   aprun -n 128 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 128_four.txt 2>&1 &
-   aprun -n 256 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 256_one.txt 2>&1 &
-   aprun -n 256 -N $RANKS_PER_NODE singularity run -B /opt:/opt:ro -B /var/opt:/var/opt:ro --app mbw_mr /home/sgww/72418Container > 256_two.txt 2>&1 &
+   /home/sgww/crazy_auto_test/firstestin.sh > 128_one.txt 2>$1 &
+   /home/sgww/crazy_auto_test/firstestin.sh > 128_two.txt 2>$1 &
+   /home/sgww/crazy_auto_test/secondtestin.sh > 256_one.txt 2>&1 &
    wait
 fi
 '''
