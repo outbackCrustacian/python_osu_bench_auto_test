@@ -15,8 +15,6 @@ def main():
     os.mkdir(dirs[1])
     i = 0
     while(i < 2):
-        #1st time through, this makes the directories for inside a container and makes the settings.txt and submit.sh files
-        #second time through it does the same but for outside the container
         os.chdir(dirs[i])
         if(dirs[i] == dirs[1]):
             create_submit(False)
