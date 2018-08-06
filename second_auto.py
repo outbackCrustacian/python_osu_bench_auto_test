@@ -20,7 +20,6 @@ def main():
             create_submit(False)
         else:
             create_submit(True)
-        os.chdir("..")
         i += 1
 
 def create_submit(use_container):
