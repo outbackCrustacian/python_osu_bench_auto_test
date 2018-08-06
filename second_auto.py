@@ -59,9 +59,9 @@ USE_CONTAINER={use_container}
 if [ "$USE_CONTAINER" = "FALSE" ] || [ "$USE_CONTAINER" = "false" ] || [ "$USE_CONTAINER" = "False" ]; then
    echo RUNNING OUTSIDE OF CONTAINER
    sleep 3
-   /home/sgww/crazy_auto_test/firstestout.sh > 128_one.txt 2>$1 &
+   /home/sgww/crazy_auto_test/firstestout.sh > 128_one.txt 2>&1 &
    sleep 3
-   /home/sgww/crazy_auto_test/firstestout.sh > 128_two.txt 2>$1 &
+   /home/sgww/crazy_auto_test/firstestout.sh > 128_two.txt 2>&1 &
    sleep 3
    /home/sgww/crazy_auto_test/secondtestout.sh > 256_one.txt 2>&1 &
    sleep 3
@@ -91,9 +91,9 @@ export SINGULARITYENV_LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$SINGULARI
 if [ "$USE_CONTAINER" = "TRUE" ] || [ "$USE_CONTAINER" = "true" ] || [ "$USE_CONTAINER" = "True" ]; then
    echo RUNNING INSIDE CONTAINER
    sleep 3
-   /home/sgww/crazy_auto_test/firstestin.sh > 128_one.txt 2>$1 &
+   /home/sgww/crazy_auto_test/firstestin.sh > 128_one.txt 2>&1 &
    sleep 3
-   /home/sgww/crazy_auto_test/firstestin.sh > 128_two.txt 2>$1 &
+   /home/sgww/crazy_auto_test/firstestin.sh > 128_two.txt 2>&1 &
    sleep 3
    /home/sgww/crazy_auto_test/secondtestin.sh > 256_one.txt 2>&1 &
    sleep 3
