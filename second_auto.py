@@ -28,7 +28,7 @@ def main():
 def create_submit(use_container):
     job_num = 'Container' + str(use_container)
 
-    job_dir = os.getcwd() + '/' + job_num
+    job_dir = os.getcwd() + '/'
 
     # create submit file
     queue = 'default'
